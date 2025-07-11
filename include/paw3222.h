@@ -9,6 +9,8 @@
 #ifndef ZEPHYR_INCLUDE_INPUT_PAW32XX_H_
 #define ZEPHYR_INCLUDE_INPUT_PAW32XX_H_
 
+struct paw32xx_config; 
+
 enum paw32xx_rotation {
 	PAW32XX_ROTATION_0 = 0,
 	PAW32XX_ROTATION_90,
