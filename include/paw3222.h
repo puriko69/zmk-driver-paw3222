@@ -31,5 +31,6 @@ int paw32xx_set_resolution(const struct device *dev, uint16_t res_cpi);
  * @param enable whether to enable or disable force awake mode.
  */
 int paw32xx_force_awake(const struct device *dev, bool enable);
+void paw32xx_apply_rotation(const struct paw32xx_config *cfg, int16_t *x, int16_t *y);
 
 #endif /* ZEPHYR_INCLUDE_INPUT_PAW32XX_H_ */

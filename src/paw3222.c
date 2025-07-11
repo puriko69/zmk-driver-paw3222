@@ -319,7 +319,7 @@ int paw32xx_force_awake(const struct device *dev, bool enable) {
     return 0;
 }
 
-static void paw32xx_apply_rotation(const struct paw32xx_config *cfg, int16_t *x, int16_t *y)
+void paw32xx_apply_rotation(const struct paw32xx_config *cfg, int16_t *x, int16_t *y)
 {
 	int16_t tmp;
 
