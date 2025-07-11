@@ -4,10 +4,3 @@ menuconfig PAW3222
   select SPI
     help
       Enable PAW3222 mouse optical sensor.
-
-enum paw32xx_rotation {
-	PAW32XX_ROTATION_0 = 0,
-	PAW32XX_ROTATION_90,
-	PAW32XX_ROTATION_180,
-	PAW32XX_ROTATION_270,
-};
