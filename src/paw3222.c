@@ -235,31 +235,6 @@ static void paw32xx_motion_work_handler(struct k_work *work) {
         return;
     }
 
-	
-	static void paw32xx_motion_work_handler(struct k_work *work)
-{
-	struct paw32xx_data *data = CONTAINER_OF(
-			work, struct paw32xx_data, motion_work);
-	const struct device *dev = data->dev;
-	const struct paw32xx_config *cfg = dev->config;
-	uint8_t val;
-	int16_t x, y;
-	int ret;
-
-	ret = paw32xx_read_reg(dev, PAW32XX_MOTION, &val);
-	if (ret < 0) {
-		return;
-	}
-
-	if ((val & MOTION_STATUS_MOTION) == 0x00) {
-		return;
-	}
-
-	ret = paw32xx_read_xy(dev, &x, &y);
-	if (ret < 0) {
-		return;
-	}
-
 	//回転適用
 	paw32xx_apply_rotation(cfg, &x, &y);
 	
@@ -548,7 +523,7 @@ static int paw32xx_pm_action(const struct device *dev, enum pm_device_action act
         .power_gpio = GPIO_DT_SPEC_INST_GET_OR(n, power_gpios, {0}),                               \
         .res_cpi = DT_INST_PROP_OR(n, res_cpi, -1),                                                \
         .force_awake = DT_INST_PROP(n, force_awake),                                               \
-    	.rotation = PAW32XX_ROTATION_ENUM(DT_INST_PROP_OR(n, rotation, 0)),                        \   //軸回転
+    	.rotation = PAW32XX_ROTATION_ENUM(DT_INST_PROP_OR(n, rotation, 0)),                        \
     };                                                                                             \
                                                                                                    \
     static struct paw32xx_data paw32xx_data_##n;                                                   \
