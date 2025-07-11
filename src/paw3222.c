@@ -513,6 +513,12 @@ static int paw32xx_pm_action(const struct device *dev, enum pm_device_action act
 #define PAW32XX_SPI_MODE                                                                           \
     (SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_TRANSFER_MSB)
 
+#define PAW32XX_ROTATION_ENUM(val) \
+	((val) == 90 ? PAW32XX_ROTATION_90 : \
+	 (val) == 180 ? PAW32XX_ROTATION_180 : \
+	 (val) == 270 ? PAW32XX_ROTATION_270 : \
+	 PAW32XX_ROTATION_0)
+
 #define PAW32XX_INIT(n)                                                                            \
     BUILD_ASSERT(IN_RANGE(DT_INST_PROP_OR(n, res_cpi, RES_MIN), RES_MIN, RES_MAX),                 \
                  "invalid res-cpi");                                                               \
@@ -535,11 +541,5 @@ static int paw32xx_pm_action(const struct device *dev, enum pm_device_action act
 
 
 DT_INST_FOREACH_STATUS_OKAY(PAW32XX_INIT)
-
-#define PAW32XX_ROTATION_ENUM(val) \
-	((val) == 90 ? PAW32XX_ROTATION_90 : \
-	 (val) == 180 ? PAW32XX_ROTATION_180 : \
-	 (val) == 270 ? PAW32XX_ROTATION_270 : \
-	 PAW32XX_ROTATION_0)
 
 #endif // DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
