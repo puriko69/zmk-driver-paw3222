@@ -33,15 +33,3 @@ properties:
       Initialize the sensor in "force awake" mode. This can also be enabled or
       disabled in runtime by the application using the paw32xx_force_awake()
       API.
-
-&i2c1 {
-	paw3205@0 {
-		compatible = "pixart,paw32xx";
-		reg = <0>; // SPI/I2C アドレスまたはチップセレクト
-		rotation = <90>; // ← ★ここが追加
-		invert-x;
-		invert-y;
-		zephyr,axis-x = <INPUT_REL_X>;
-		zephyr,axis-y = <INPUT_REL_Y>;
-	};
-};

@@ -73,23 +73,6 @@ struct paw32xx_config {
     struct gpio_dt_spec power_gpio;
     int16_t res_cpi;
     bool force_awake;
-	enum paw32xx_rotation rotation;
-	
-	#define PAW32XX_INIT(n)								\
-	BUILD_ASSERT(IN_RANGE(DT_INST_PROP_OR(n, res_cpi, RES_MIN),		\
-			      RES_MIN, RES_MAX), "invalid res-cpi");		\
-										\
-	static const struct paw32xx_config paw32xx_cfg_##n = {			\
-		.spi = SPI_DT_SPEC_INST_GET(n, PAW32XX_SPI_MODE, 0),		\
-		.motion_gpio = GPIO_DT_SPEC_INST_GET(n, motion_gpios),		\
-		.axis_x = DT_INST_PROP(n, zephyr_axis_x),			\
-		.axis_y = DT_INST_PROP(n, zephyr_axis_y),			\
-		.res_cpi = DT_INST_PROP_OR(n, res_cpi, -1),			\
-		.invert_x = DT_INST_PROP(n, invert_x),				\
-		.invert_y = DT_INST_PROP(n, invert_y),				\
-		.force_awake = DT_INST_PROP(n, force_awake),			\
-		.rotation = PAW32XX_ROTATION_ENUM(DT_INST_PROP_OR(n, rotation, 0)), \
-	};									\
 };
 
 struct paw32xx_data {
@@ -251,34 +234,6 @@ static void paw32xx_motion_work_handler(struct k_work *work) {
         return;
     }
 
-	
-	static void paw32xx_motion_work_handler(struct k_work *work)
-{
-	struct paw32xx_data *data = CONTAINER_OF(
-			work, struct paw32xx_data, motion_work);
-	const struct device *dev = data->dev;
-	const struct paw32xx_config *cfg = dev->config;
-	uint8_t val;
-	int16_t x, y;
-	int ret;
-
-	ret = paw32xx_read_reg(dev, PAW32XX_MOTION, &val);
-	if (ret < 0) {
-		return;
-	}
-
-	if ((val & MOTION_STATUS_MOTION) == 0x00) {
-		return;
-	}
-
-	ret = paw32xx_read_xy(dev, &x, &y);
-	if (ret < 0) {
-		return;
-	}
-
-	//回転適用
-	paw32xx_apply_rotation(cfg, &x, &y);
-	
     LOG_DBG("x=%4d y=%4d", x, y);
 
     input_report_rel(data->dev, INPUT_REL_X, x, false, K_FOREVER);
@@ -359,33 +314,6 @@ int paw32xx_force_awake(const struct device *dev, bool enable) {
 
     return 0;
 }
-
-static void paw32xx_apply_rotation(const struct paw32xx_config *cfg,
-                                   int16_t *x, int16_t *y)
-{
-	int16_t tmp;
-
-	switch (cfg->rotation) {
-	case PAW32XX_ROTATION_90:
-		tmp = *x;
-		*x = *y;
-		*y = -tmp;
-		break;
-	case PAW32XX_ROTATION_180:
-		*x = -*x;
-		*y = -*y;
-		break;
-	case PAW32XX_ROTATION_270:
-		tmp = *x;
-		*x = -*y;
-		*y = tmp;
-		break;
-	default:
-		/* No rotation (0 degrees) */
-		break;
-	}
-}
-
 
 static int paw32xx_configure(const struct device *dev) {
     const struct paw32xx_config *cfg = dev->config;
