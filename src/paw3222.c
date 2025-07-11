@@ -73,23 +73,7 @@ struct paw32xx_config {
     struct gpio_dt_spec power_gpio;
     int16_t res_cpi;
     bool force_awake;
-	enum paw32xx_rotation rotation;
-	
-	#define PAW32XX_INIT(n)								\
-	BUILD_ASSERT(IN_RANGE(DT_INST_PROP_OR(n, res_cpi, RES_MIN),		\
-			      RES_MIN, RES_MAX), "invalid res-cpi");		\
-										\
-	static const struct paw32xx_config paw32xx_cfg_##n = {			\
-		.spi = SPI_DT_SPEC_INST_GET(n, PAW32XX_SPI_MODE, 0),		\
-		.motion_gpio = GPIO_DT_SPEC_INST_GET(n, motion_gpios),		\
-		.axis_x = DT_INST_PROP(n, zephyr_axis_x),			\
-		.axis_y = DT_INST_PROP(n, zephyr_axis_y),			\
-		.res_cpi = DT_INST_PROP_OR(n, res_cpi, -1),			\
-		.invert_x = DT_INST_PROP(n, invert_x),				\
-		.invert_y = DT_INST_PROP(n, invert_y),				\
-		.force_awake = DT_INST_PROP(n, force_awake),			\
-		.rotation = PAW32XX_ROTATION_ENUM(DT_INST_PROP_OR(n, rotation, 0)), \
-	};									\
+	enum paw32xx_rotation rotation;  //軸回転追加
 };
 
 struct paw32xx_data {
@@ -360,8 +344,7 @@ int paw32xx_force_awake(const struct device *dev, bool enable) {
     return 0;
 }
 
-static void paw32xx_apply_rotation(const struct paw32xx_config *cfg,
-                                   int16_t *x, int16_t *y)
+static void paw32xx_apply_rotation(const struct paw32xx_config *cfg, int16_t *x, int16_t *y)
 {
 	int16_t tmp;
 
@@ -381,10 +364,10 @@ static void paw32xx_apply_rotation(const struct paw32xx_config *cfg,
 		*y = tmp;
 		break;
 	default:
-		/* No rotation (0 degrees) */
-		break;
+		break; // PAW32XX_ROTATION_0
 	}
 }
+
 
 
 static int paw32xx_configure(const struct device *dev) {
@@ -565,6 +548,7 @@ static int paw32xx_pm_action(const struct device *dev, enum pm_device_action act
         .power_gpio = GPIO_DT_SPEC_INST_GET_OR(n, power_gpios, {0}),                               \
         .res_cpi = DT_INST_PROP_OR(n, res_cpi, -1),                                                \
         .force_awake = DT_INST_PROP(n, force_awake),                                               \
+    	.rotation = PAW32XX_ROTATION_ENUM(DT_INST_PROP_OR(n, rotation, 0)),                        \   //軸回転
     };                                                                                             \
                                                                                                    \
     static struct paw32xx_data paw32xx_data_##n;                                                   \
@@ -574,6 +558,13 @@ static int paw32xx_pm_action(const struct device *dev, enum pm_device_action act
     DEVICE_DT_INST_DEFINE(n, paw32xx_init, PM_DEVICE_DT_INST_GET(n), &paw32xx_data_##n,            \
                           &paw32xx_cfg_##n, POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY, NULL);
 
+
 DT_INST_FOREACH_STATUS_OKAY(PAW32XX_INIT)
+
+#define PAW32XX_ROTATION_ENUM(val) \
+	((val) == 90 ? PAW32XX_ROTATION_90 : \
+	 (val) == 180 ? PAW32XX_ROTATION_180 : \
+	 (val) == 270 ? PAW32XX_ROTATION_270 : \
+	 PAW32XX_ROTATION_0)
 
 #endif // DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)

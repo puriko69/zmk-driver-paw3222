@@ -9,6 +9,13 @@
 #ifndef ZEPHYR_INCLUDE_INPUT_PAW32XX_H_
 #define ZEPHYR_INCLUDE_INPUT_PAW32XX_H_
 
+enum paw32xx_rotation {
+	PAW32XX_ROTATION_0 = 0,
+	PAW32XX_ROTATION_90,
+	PAW32XX_ROTATION_180,
+	PAW32XX_ROTATION_270,
+};
+
 /**
  * @brief Set resolution on a paw32xx device
  *
@@ -24,11 +31,5 @@ int paw32xx_set_resolution(const struct device *dev, uint16_t res_cpi);
  * @param enable whether to enable or disable force awake mode.
  */
 int paw32xx_force_awake(const struct device *dev, bool enable);
-
-#define PAW32XX_ROTATION_ENUM(val) \
-	((val) == 90 ? PAW32XX_ROTATION_90 : \
-	 (val) == 180 ? PAW32XX_ROTATION_180 : \
-	 (val) == 270 ? PAW32XX_ROTATION_270 : \
-	 PAW32XX_ROTATION_0)
 
 #endif /* ZEPHYR_INCLUDE_INPUT_PAW32XX_H_ */
