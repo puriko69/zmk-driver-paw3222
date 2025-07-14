@@ -44,4 +44,9 @@ properties:
       - 90: Rotated 90 degrees
       - 180: Rotated 180 degrees
       - 270: Rotated 270 degrees
-      
+
+  scroll-layers:
+    type: array
+    required: false
+    description: |
+      Layers on which scrolling is active
